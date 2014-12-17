@@ -1,5 +1,20 @@
 ## Starter Shield Library ##
 
+改编为番茄时钟代码
+
+##普通钟表模式
+1. 按键A为模式控制按钮，可分为时钟调节模式，闹钟调节模式。
+2. 按键B为番茄钟控制按钮，可分为番茄时间长短，休息时间长短设定。
+3. 按键C为温度显式按钮
+
+##番茄钟模式
+1. 每25分钟，蜂鸣器发声提示休息，用手遮盖光敏电阻，关闭蜂鸣器，开始休息记时5分钟。五分钟结束后，蜂鸣器提示休息结束，用手遮盖光敏电阻，开始工作记时25分钟。
+2. 按键A返回普通钟表模式
+3. 按键C显式温度
+
+
+
+
 Starter Shield is a perfect start for beginners of Arduino world. You can learn and practice basic soldering tricks and programming principles when tinkering with this kit. Electronic could be fun even if you have bare technical knowledge cause we get your back by preparing a detailed soldering guide and a fully supported library of programming examples from easy to difficult. Hope you have fun and gain some knowledge with this kit!
 
 Starter Shield contains most common resources for a basic electronic project, like buttons, sensors, buzzer and display. After you're done with the soldering task, it turns out to be a geek style alarm clock which can auto adjust the brightness of display and keep in synch with real world time.

@@ -124,6 +124,7 @@ void timerIsr()
             buz.on();
             OLDSTATE = ST_POMO;
             state = ST_POMOALM;
+			disp.time(25,0);
           }
         }
         
@@ -143,6 +144,7 @@ void timerIsr()
             buz.on();
             OLDSTATE = ST_REST;
             state = ST_POMOALM;
+			disp.time(5,0);
           }
         }
       }

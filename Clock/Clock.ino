@@ -141,7 +141,12 @@ void loop()
 
     switch(state)
     {
-    
+		//---------------------------------- ST_POMO --------------------------------------------
+		case ST_POMO
+		
+		
+		
+		
         //---------------------------------- ST_TIME --------------------------------------------
         case ST_TIME:
 		
@@ -150,11 +155,19 @@ void loop()
             led1.on();                                          // led1 on to indicate set time
         }
         
+		if(keyEvent(keyUp,ST_POMO, "goto ST_POMO"))
+		{
+		
+		}
+		
+		
+		
+		
         // get time
         now_hour = time.getHour();
         now_min  = time.getMin();
         now_sec  = time.getSec();
-        
+        /*
         isAlarm();                                              // check if alarm
         
         if(keyDown.pressed())                                   // press keyDown, display temperature

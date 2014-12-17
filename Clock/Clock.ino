@@ -223,6 +223,7 @@ void loop()
         
         if(keyEvent(keyUp, ST_SETPOMO, "goto ST_SETPOMO"))
         {
+			
         }
         
         // get time
@@ -354,6 +355,12 @@ void loop()
         now_hour = time.getHour();
         now_min  = time.getMin();
         now_sec  = time.getSec();
+		
+		if(keyEvent(keyMode, ST_TIME, "pomo mode exit!\r\ngoto ST_TIME"))
+        {
+        }
+		
+        break;
         
 //        span_sec = ((now_sec + 60 - pomo_sec) % 60);
 //        
@@ -392,7 +399,6 @@ void loop()
 //           }
 //        }
 
-        break;
         
         //----------------------------------- ST_REST --------------------------------------------        
         case ST_REST:
@@ -401,6 +407,10 @@ void loop()
         now_hour = time.getHour();
         now_sec  = time.getSec();
         
+		if(keyEvent(keyMode, ST_TIME, "pomo mode exit!\r\ngoto ST_TIME"))
+        {
+        }
+		
 //        restspan_sec = ((now_sec + 60 - rest_sec) % 60);
 //        
 //        if(restspan_sec == 59)
@@ -456,6 +466,10 @@ void loop()
             {
               state = ST_SETPOMO;
             }
+        }
+		
+		if(keyEvent(keyMode, ST_TIME, "pomo mode exit!\r\ngoto ST_TIME"))
+        {
         }
         
         break;

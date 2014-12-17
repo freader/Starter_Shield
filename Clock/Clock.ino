@@ -20,7 +20,10 @@
 #define ST_ALARMING         4               // alarming
 #define ST_LIGHT            5               // display light
 #define ST_SETIME           6               // set time 
-
+#define ST_SETPOMO          7               // set pomo start
+#define ST_POMO             8               // begain pomo
+#define ST_POMOALM          9               // begain pomo alarm
+#define ST_REST             10              // begain rest
 
 // object define here
 TTSDisplay disp;                            // instantiate an object of display
@@ -52,7 +55,23 @@ int now_hour;                               // hour of running
 int now_min;                                // minutes of running
 int now_sec;                                // second of running
 
+int pomo_hour;
+int pomo_min;
+int pomo_sec;
 
+int rest_hour;
+int rest_min;
+int rest_sec;
+
+ unsigned char rest_colon = 0;
+ unsigned char pomo_colon = 0;
+ int span_sec = 0;
+ int span_min = 0;
+ int restspan_sec = 0;
+ int restspan_min = 0;
+ 
+ int oldspan_sec = 0;
+ int OLDSTATE = 0;
 /*********************************************************************************************************
  * Function Name: timerIsr
  * Description:  timer on interrupt service function to display time per 500ms
@@ -75,6 +94,58 @@ void timerIsr()
         }
         disp.time(now_hour, now_min); 
     }
+    
+    if(ST_POMO == state || ST_REST == state)
+    {
+        state_colon = 1-state_colon;
+        if(state_colon)
+        {
+            disp.pointOn();                             // : on
+        }
+        else
+        {
+            disp.pointOff();                            // : off
+        }
+        
+        if(ST_POMO == state)
+        {
+          span_sec = ((now_sec + 60 - pomo_sec) % 60);
+          
+          if(span_sec == 59 && oldspan_sec != span_sec)
+          {
+            span_min++;
+          }
+          oldspan_sec = span_sec;
+        
+          disp.time(span_min, span_sec);
+        
+          if(span_min == 25)
+          {
+            buz.on();
+            OLDSTATE = ST_POMO;
+            state = ST_POMOALM;
+          }
+        }
+        
+         if(ST_REST == state)
+         {
+           restspan_sec = ((now_sec + 60 - pomo_sec) % 60);
+          
+          if(restspan_sec == 59 && oldspan_sec != restspan_sec)
+          {
+            restspan_min++;
+          }
+          oldspan_sec = restspan_sec;
+        
+          disp.time(restspan_min, restspan_sec);
+          if(restspan_min == 5)
+          {
+            buz.on();
+            OLDSTATE = ST_REST;
+            state = ST_POMOALM;
+          }
+        }
+      }
 }
 
 /*********************************************************************************************************
@@ -141,33 +212,24 @@ void loop()
 
     switch(state)
     {
-		//---------------------------------- ST_POMO --------------------------------------------
-		case ST_POMO
-		
-		
-		
-		
+    
         //---------------------------------- ST_TIME --------------------------------------------
         case ST_TIME:
-		
+          	
         if(keyEvent(keyMode, ST_SETIME, "goto ST_SETIME"))      // press keyMode, goto set time mode
         {
             led1.on();                                          // led1 on to indicate set time
         }
         
-		if(keyEvent(keyUp,ST_POMO, "goto ST_POMO"))
-		{
-		
-		}
-		
-		
-		
-		
+        if(keyEvent(keyUp, ST_SETPOMO, "goto ST_SETPOMO"))
+        {
+        }
+        
         // get time
         now_hour = time.getHour();
         now_min  = time.getMin();
         now_sec  = time.getSec();
-        /*
+        
         isAlarm();                                              // check if alarm
         
         if(keyDown.pressed())                                   // press keyDown, display temperature
@@ -184,22 +246,22 @@ void loop()
             state = ST_TIME;  
         }
         
-        if(keyUp.pressed())                                     // press keyUp, display light sensor value
-        {
-
-            led4.on();                                          // led4 on for 10ms
-            delay(10);
-            led4.off();
-            while(keyUp.pressed())                              // display light value until release keyUp
-            {
-                state = ST_LIGHT;
-                int val_light = light.get();
-                disp.num(val_light);
-                
-                delay(100);
-            }
-            state = ST_TIME;  
-        }
+//        if(keyUp.pressed())                                     // press keyUp, display light sensor value
+//        {
+//
+//            led4.on();                                          // led4 on for 10ms
+//            delay(10);
+//            led4.off();
+//            while(keyUp.pressed())                              // display light value until release keyUp
+//            {
+//                state = ST_LIGHT;
+//                int val_light = light.get();
+//                disp.num(val_light);
+//                
+//                delay(100);
+//            }
+//            state = ST_TIME;  
+//        }
         
         break;
         
@@ -268,9 +330,138 @@ void loop()
             state = ST_TIME;
         }
         break;
-    }
-}
+  
 
+        //----------------------------------- ST_SETPOMO --------------------------------------------
+        case ST_SETPOMO:    
+        
+        pomo_hour = now_hour;
+        pomo_min = now_min;
+        pomo_sec = now_sec;
+        
+        span_sec = 0;
+        span_min = 0;
+        
+        restspan_sec = 0;
+        restspan_min = 0;
+        
+        state = ST_POMO;  
+ 
+        break;
+        //----------------------------------- ST_POMO --------------------------------------------
+        case ST_POMO:
+        
+        now_hour = time.getHour();
+        now_min  = time.getMin();
+        now_sec  = time.getSec();
+        
+//        span_sec = ((now_sec + 60 - pomo_sec) % 60);
+//        
+//        if(span_sec == 59)
+//        {
+//          span_min++;
+//        }
+//        
+//        disp.time(span_min, span_sec);
+//        
+//        Serial.println(span_min);
+//        
+//        if(span_min == 25)
+//        {
+//          buz.on();
+//          state = ST_POMOALM;
+//          Serial.println("go to st_REST");
+//        }
+//        
+//        disp.time((now_min - pomo_min + 60) % 60, (now_sec + 60 - pomo_sec) % 60 );
+//        if( now_min > pomo_min)
+//        {
+//          if( now_min - pomo_min >= 25 )
+//          if( span_sec >= 25*60 )
+//          {
+//             buz.on();
+//             state = ST_POMOALM;
+//          }
+//        }
+//        else if( now_min < pomo_min )
+//        {
+//           if( now_min + 60 - pomo_min >= 25 )
+//           {
+//             buz.on();
+//             state = ST_POMOALM;
+//           }
+//        }
+
+        break;
+        
+        //----------------------------------- ST_REST --------------------------------------------        
+        case ST_REST:
+        
+        now_min  = time.getMin();
+        now_hour = time.getHour();
+        now_sec  = time.getSec();
+        
+//        restspan_sec = ((now_sec + 60 - rest_sec) % 60);
+//        
+//        if(restspan_sec == 59)
+//        {
+//          restspan_min++;
+//        }
+//        Serial.println(restspan_min);
+//        disp.time(restspan_min, restspan_sec);
+//        
+//        if(restspan_min == 5)
+//        {
+//          buz.on();
+//          state = ST_POMOALM;
+//        }
+        
+//        disp.time((now_min + 60 - rest_min) % 60, now_sec );
+//        
+//        if( now_min > rest_min)
+//        {
+//          if( now_min - rest_min >= 5 )
+//          {
+//             buz.on();
+//             state = ST_POMOALM;
+//          }
+//        }
+//        else if( now_min < rest_min )
+//        {
+//           if( now_min + 60 - rest_min >= 5 )
+//           {
+//             buz.on();
+//             state = ST_POMOALM;
+//           }
+//        }
+                        
+        break;
+        
+        //----------------------------------- ST_POMOALM --------------------------------------------        
+        case ST_POMOALM: 
+        
+        if(light.get() < 300)                                   // if light sensor value less than 300
+        {
+            buz.off();
+            
+            if(OLDSTATE == ST_POMO)
+            {
+              rest_hour = now_hour;
+              rest_min = now_min;
+              rest_sec = now_sec;
+              
+              state = ST_REST;
+            }
+            if(OLDSTATE == ST_REST)
+            {
+              state = ST_SETPOMO;
+            }
+        }
+        
+        break;
+        
+   }
+}                
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
